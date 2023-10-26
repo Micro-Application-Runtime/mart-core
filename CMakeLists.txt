@@ -13,16 +13,13 @@ include(ExternalProject)
 set(QUICKJS_DIR ${PROJECT_SOURCE_DIR}/3rd/quickjs)
 
 # Add QuickJS as an external project
-add_custom_target(build_quickjs ALL
+add_custom_target(build_quickjs
     COMMAND ${CMAKE_MAKE_PROGRAM}
     WORKING_DIRECTORY ${QUICKJS_DIR}
     COMMENT "build quickjs"
+    add_custom_target ${QUICKJS_DIR}/libquickjs.a
 )
 
-# Add QuickJS library
-add_library(quickjs STATIC IMPORTED)
-set_target_properties(quickjs PROPERTIES IMPORTED_LOCATION ${QUICKJS_DIR}/libquickjs.a)
-include_directories(${QUICKJS_DIR})
 
 # Set libuv directory
 set(LIBUV_DIR ${PROJECT_SOURCE_DIR}/3rd/libuv)
@@ -40,5 +37,11 @@ file(GLOB_RECURSE SOURCE_FILES "src/*.c")
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 add_dependencies(${PROJECT_NAME} build_quickjs)
+
+# Add QuickJS library
+add_library(quickjs STATIC IMPORTED)
+set_target_properties(quickjs PROPERTIES IMPORTED_LOCATION ${QUICKJS_DIR}/libquickjs.a)
+include_directories(${QUICKJS_DIR})
+
 # Link libuv to the executable
 target_link_libraries(${PROJECT_NAME} uv_a quickjs)
