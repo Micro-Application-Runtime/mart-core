@@ -44,4 +44,4 @@ set_target_properties(quickjs PROPERTIES IMPORTED_LOCATION ${QUICKJS_DIR}/libqui
 include_directories(${QUICKJS_DIR})
 
 # Link libuv to the executable
-target_link_libraries(${PROJECT_NAME} uv_a quickjs)
+target_link_libraries(${PROJECT_NAME} uv_a quickjs dl m)
