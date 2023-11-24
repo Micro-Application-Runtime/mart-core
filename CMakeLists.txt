@@ -29,6 +29,7 @@ add_subdirectory(${LIBUV_DIR} EXCLUDE_FROM_ALL)
 
 # Set binary output directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_CXX_FLAGS "-g")
 
 # Set source files
 file(GLOB_RECURSE SOURCE_FILES "src/*.c")
