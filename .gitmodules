@@ -1,3 +1,6 @@
 [submodule "3rd/libuv"]
 	path = 3rd/libuv
 	url = https://github.com/Micro-Application-Runtime/libuv.git
+[submodule "3rd/quickjs"]
+	path = 3rd/quickjs
+	url = git@github.com:Micro-Application-Runtime/quickjs.git
