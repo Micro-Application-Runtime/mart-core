@@ -12,7 +12,6 @@
 
 int main(int argc, char **argv)
 {
-    LOG_I("Runtime","start");
     JSRuntime *rt = NULL;
     JSContext *ctx = NULL;
     uv_loop_t loop;
@@ -45,7 +44,7 @@ int main(int argc, char **argv)
     // 注册setTimeout函数到QuickJS中
     JSValue global_obj = JS_GetGlobalObject(ctx);
     JS_SetPropertyStr(ctx, global_obj, "setTimeout", JS_NewCFunction(ctx, js_setTimeout, "setTimeout", 1));
-    // JS_FreeValue(ctx, global_obj);
+    JS_FreeValue(ctx, global_obj);
 
     /* Load and execute the JavaScript file */
     file = fopen(filename, "r");
@@ -75,7 +74,6 @@ int main(int argc, char **argv)
             const char *exception_str = JS_ToCString(ctx, exception);
             fprintf(stderr, "Error1 executing JavaScript: %s\n", exception_str);
             JS_FreeCString(ctx, exception_str);
-            JS_FreeValue(ctx, exception);
         }
         JS_FreeValue(ctx, exception);
         JS_FreeValue(ctx, ret);
@@ -93,9 +91,9 @@ int main(int argc, char **argv)
         const char *exception_str = JS_ToCString(ctx, exception);
         fprintf(stderr, "Error3 executing JavaScript: %s\n", exception_str);
         JS_FreeCString(ctx, exception_str);
-        JS_FreeValue(ctx, exception);
     }
 
+    JS_FreeValue(ctx, exception);
     free(buf);
     buf = NULL;
 
