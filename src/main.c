@@ -5,12 +5,14 @@
 #include <quickjs-libc.h>
 #include <uv.h>
 
-#include "modules/global/set_timeout.h"
+#include "runtime/modules/global/set_timeout.h"
+#include "common/log.h"
 
 #define BUF_SIZE 10 * 1024 * 1024
 
 int main(int argc, char **argv)
 {
+    LOG_I("Runtime","start");
     JSRuntime *rt = NULL;
     JSContext *ctx = NULL;
     uv_loop_t loop;

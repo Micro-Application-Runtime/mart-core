@@ -20,7 +20,7 @@ JSValue job(JSContext *ctx, int argc, JSValueConst *argv)
     // JS_FreeValue(ctx, exception);
 
     // 释放资源
-    JS_FreeValue(ctx, func);
+    // JS_FreeValue(ctx, func);
 }
 
 void js_setTimeout_callback(uv_timer_t *handle)

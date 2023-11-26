@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "quickjs-libc.h": "c",
+        "set_timeout.h": "c",
+        "memory.h": "c",
+        "context.h": "c",
+        "runtime.h": "c"
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/g++"
+}
