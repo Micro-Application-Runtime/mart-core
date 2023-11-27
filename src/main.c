@@ -5,8 +5,8 @@
 #include <quickjs-libc.h>
 #include <uv.h>
 
-#include "runtime/modules/global/set_timeout.h"
-#include "common/log.h"
+#include "runtime/modules/std/settimeout.h"
+// #include "common/log.h"
 
 #define BUF_SIZE 10 * 1024 * 1024
 

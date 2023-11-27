@@ -1,8 +1,15 @@
-#include "set_timeout.h"
+#include "settimeout.h"
 
 #include <stdlib.h>
+#include <uv.h>
 
-JSValue job(JSContext *ctx, int argc, JSValueConst *argv)
+typedef struct
+{
+    JSContext *ctx;
+    JSValue func;
+} timer_callback_data_t;
+
+JSValue call_callback(JSContext *ctx, int argc, JSValueConst *argv)
 {
     // 调用QuickJS的回调函数
     JSValue func = argv[0];
@@ -14,23 +21,20 @@ JSValue job(JSContext *ctx, int argc, JSValueConst *argv)
     // {
     //     const char *exception_str = JS_ToCString(ctx, exception);
     //     fprintf(stderr, "Error2 executing JavaScript: %s\n", exception_str);
-    //     JS_FreeCString(ctx, exception_str); 
+    //     JS_FreeCString(ctx, exception_str);
     // }
 
     // JS_FreeValue(ctx, exception);
-
-    // 释放资源
-    // JS_FreeValue(ctx, func);
 }
 
-void js_setTimeout_callback(uv_timer_t *handle)
+void setTimeout_callback(uv_timer_t *handle)
 {
     timer_callback_data_t *data = (timer_callback_data_t *)handle->data;
     JSContext *ctx = data->ctx;
     JSValue func = data->func;
     JSValue args[] = {func};
 
-    JS_EnqueueJob(ctx, job, 1, args);
+    JS_EnqueueJob(ctx, call_callback, 1, args);
 
     // 释放资源
     JS_FreeValue(ctx, func);
@@ -68,7 +72,7 @@ JSValue js_setTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueCo
     timer->data = data;
 
     // 启动定时器
-    uv_timer_start(timer, js_setTimeout_callback, delay, 0);
+    uv_timer_start(timer, setTimeout_callback, delay, 0);
 
     // JS_FreeValue(ctx, func);
 
