@@ -10,7 +10,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/build/bin/mart",
       "args": [
-        "${workspaceFolder}/index.js"
+        "${workspaceFolder}/build/bin/index.js"
       ],
       "environment": [
         {

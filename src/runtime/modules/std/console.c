@@ -1,4 +1,4 @@
-#include "console_log.h"
+#include "console.h"
 
 JSValue js_console_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
@@ -17,5 +17,5 @@ JSValue js_console_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueC
         JS_FreeCString(ctx, str);
     }
     putchar('\n');
-    return JS_UNDEFINED;
+    return JS_UNDEFINED; 
 }
