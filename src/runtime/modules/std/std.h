@@ -3,6 +3,6 @@
 
 #include "runtime/runtime.h"
 
-void runtime_add_std(runtime_t *rt);
+void add_std(JSContext *ctx);
 
 #endif // __MODULES_STD_STD_H__

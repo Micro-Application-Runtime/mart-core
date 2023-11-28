@@ -2,15 +2,14 @@
 
 #include "runtime/modules/process/exit.h"
 
-void runtime_add_process(runtime_t *rt)
+void add_process(JSContext *ctx)
 {
-    JSContext *qjs_ctx = rt->qjs_ctx;
-    JSValue global = JS_GetGlobalObject(qjs_ctx);
+    JSValue global = JS_GetGlobalObject(ctx);
 
-    JSValue process = JS_NewObject(qjs_ctx);
-    JS_SetPropertyStr(qjs_ctx, process, "exit", JS_NewCFunction(qjs_ctx, js_process_exit, "exit", 1));
-    JS_SetPropertyStr(qjs_ctx, global, "process", process);
+    JSValue process = JS_NewObject(ctx);
+    JS_SetPropertyStr(ctx, process, "exit", JS_NewCFunction(ctx, js_process_exit, "exit", 1));
+    JS_SetPropertyStr(ctx, global, "process", process);
 
     // 释放 global 对象的引用
-    JS_FreeValue(qjs_ctx, global);
+    JS_FreeValue(ctx, global);
 }

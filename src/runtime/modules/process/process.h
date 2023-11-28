@@ -3,6 +3,6 @@
 
 #include "runtime/runtime.h"
 
-void runtime_add_process(runtime_t *rt);
+void add_process(JSContext *ctx);
 
 #endif // __MODULES_PROCESS_PROCESS_H__

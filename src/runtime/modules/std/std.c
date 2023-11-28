@@ -3,22 +3,24 @@
 #include "runtime/modules/std/console.h"
 #include "runtime/modules/std/settimeout.h"
 
-void runtime_add_std(runtime_t *rt)
+void add_std(JSContext *ctx)
 {
-    JSContext *qjs_ctx = rt->qjs_ctx;
-    JSValue global = JS_GetGlobalObject(qjs_ctx);
+    JSValue global = JS_GetGlobalObject(ctx);
 
     // 注册 console.log 到 global 对象中
-    JSValue console = JS_NewObject(qjs_ctx);
-    JS_SetPropertyStr(qjs_ctx, console, "log", JS_NewCFunction(qjs_ctx, js_console_log, "log", 1));
-    JS_SetPropertyStr(qjs_ctx, global, "console", console);
+    JSValue console = JS_NewObject(ctx);
+    JS_SetPropertyStr(ctx, console, "log", JS_NewCFunction(ctx, js_console_log, "log", 1));
+    JS_SetPropertyStr(ctx, global, "console", console);
 
     // 注册 setTimeout 到 global 对象中
-    JS_SetPropertyStr(qjs_ctx, global, "setTimeout", JS_NewCFunction(qjs_ctx, js_setTimeout, "setTimeout", 2));
+    JS_SetPropertyStr(ctx, global, "setTimeout", JS_NewCFunction(ctx, js_setTimeout, "setTimeout", 2));
 
     // 注册 clearTimeout 到 global 对象中
-    JS_SetPropertyStr(qjs_ctx, global, "clearTimeout", JS_NewCFunction(qjs_ctx, js_clearTimeout, "clearTimeout", 1));
+    JS_SetPropertyStr(ctx, global, "clearTimeout", JS_NewCFunction(ctx, js_clearTimeout, "clearTimeout", 1));
+
+    // 注册 setInterval 到 global 对象中
+    JS_SetPropertyStr(ctx, global, "setInterval", JS_NewCFunction(ctx, js_setInterval, "setInterval", 2));
 
     // 释放 global 对象的引用
-    JS_FreeValue(qjs_ctx, global);
+    JS_FreeValue(ctx, global);
 }

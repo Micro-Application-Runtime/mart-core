@@ -11,5 +11,6 @@ typedef struct
 
 JSValue js_setTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 JSValue js_clearTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
+JSValue js_setInterval(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 
 #endif // __MODULES_STD_SETTIMEOUT_H__

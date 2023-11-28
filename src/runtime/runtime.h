@@ -17,7 +17,11 @@ typedef struct
 
 int runtime_init(runtime_t *rt);
 
+int runtime_set_exit_func(runtime_t *rt, exit_func_t exit_func);
+
 int runtime_load_js_file(runtime_t *rt, const char *file_path);
+
+int runtime_call_in_loop(runtime_t *rt, JSJobFunc func, int argc, JSValueConst *argv);
 
 int runtime_send_to_brige(runtime_t *rt, int argc, JSValueConst *argv);
 

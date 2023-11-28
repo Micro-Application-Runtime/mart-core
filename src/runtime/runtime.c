@@ -29,11 +29,21 @@ int runtime_init(runtime_t *rt)
     JS_SetContextOpaque(rt->qjs_ctx, rt);
 
     // 注册模块到 QuickJS
-    runtime_add_std(rt);
-    runtime_add_process(rt);
-    // runtime_add_brige(rt);
+    add_std(rt->qjs_ctx);
+    add_process(rt->qjs_ctx);
+    add_brige(rt->qjs_ctx);
 
     return 0;
+}
+
+int runtime_set_exit_func(runtime_t *rt, exit_func_t exit_func)
+{
+    if (rt == NULL)
+    {
+        return -1;
+    }
+
+    rt->exit_func = exit_func;
 }
 
 int runtime_load_js_file(runtime_t *rt, const char *file_path)
@@ -79,8 +89,31 @@ int runtime_load_js_file(runtime_t *rt, const char *file_path)
     return 0;
 }
 
+int runtime_call_in_loop(runtime_t *rt, JSJobFunc func, int argc, JSValueConst *argv)
+{
+    if (rt == NULL)
+    {
+        return -1;
+    }
+
+    if (func == NULL)
+    {
+        return -1;
+    }
+
+    JS_EnqueueJob(rt->qjs_ctx, func, argc, argv);
+
+    return 0;
+}
+
 int runtime_send_to_brige(runtime_t *rt, int argc, JSValueConst *argv)
 {
+    if (rt == NULL)
+    {
+        return -1;
+    }
+
+    send_to_brige(rt->qjs_ctx, argc, argv);
 }
 
 int runtime_run_loop(runtime_t *rt)
@@ -125,6 +158,8 @@ int runtime_destory(runtime_t *rt)
         return -1;
     }
 
+    // TODO: libuv中的数据应该被释放
+    uv_stop(rt->uv_loop);
     uv_loop_close(rt->uv_loop);
     free(rt->uv_loop);
     JS_FreeContext(rt->qjs_ctx);
