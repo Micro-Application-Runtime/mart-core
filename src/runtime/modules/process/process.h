@@ -1,8 +1,8 @@
-#ifndef __MODULES_PROCESS_PROCESS_H__
-#define __MODULES_PROCESS_PROCESS_H__
+#ifndef __MODULES__PROCESS__PROCESS_H__
+#define __MODULES__PROCESS__PROCESS_H__
 
-#include "runtime/runtime.h"
+#include <quickjs.h>
 
 void add_process(JSContext *ctx);
 
-#endif // __MODULES_PROCESS_PROCESS_H__
+#endif // __MODULES__PROCESS__PROCESS_H__

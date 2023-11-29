@@ -4,3 +4,9 @@
 [submodule "3rd/quickjs"]
 	path = 3rd/quickjs
 	url = git@github.com:Micro-Application-Runtime/quickjs.git
+[submodule "3rd/flashdb"]
+	path = 3rd/flashdb
+	url = https://github.com/Micro-Application-Runtime/FlashDB.git
+[submodule "3rd/EasyLogger"]
+	path = 3rd/EasyLogger
+	url = https://github.com/Micro-Application-Runtime/EasyLogger.git

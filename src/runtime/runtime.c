@@ -6,7 +6,7 @@
 #include "runtime/modules/process/process.h"
 #include "runtime/modules/brige/brige.h"
 
-#define BUF_SIZE 10 * 1024 * 1024
+#define BUF_SIZE 1 * 1024 * 1024
 
 int runtime_init(runtime_t *rt)
 {
@@ -85,6 +85,9 @@ int runtime_load_js_file(runtime_t *rt, const char *file_path)
         JS_FreeValue(rt->qjs_ctx, exception);
         JS_FreeValue(rt->qjs_ctx, ret);
     }
+
+    free(buf);
+    buf = NULL;
 
     return 0;
 }

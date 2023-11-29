@@ -1,10 +1,12 @@
 #include "runtime/modules/std/std.h"
 
 #include "runtime/modules/std/console.h"
-#include "runtime/modules/std/settimeout.h"
+#include "runtime/modules/std/timer.h"
 
 void add_std(JSContext *ctx)
 {
+    JS_AddIntrinsicDate(ctx);
+
     JSValue global = JS_GetGlobalObject(ctx);
 
     // 注册 console.log 到 global 对象中

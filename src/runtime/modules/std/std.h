@@ -1,8 +1,8 @@
-#ifndef __MODULES_STD_STD_H__
-#define __MODULES_STD_STD_H__
+#ifndef __MODULES__STD__STD_H__
+#define __MODULES__STD__STD_H__
 
-#include "runtime/runtime.h"
+#include <quickjs.h>
 
 void add_std(JSContext *ctx);
 
-#endif // __MODULES_STD_STD_H__
+#endif // __MODULES__STD__STD_H__
