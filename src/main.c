@@ -6,7 +6,7 @@
 #include <uv.h>
 
 #include "runtime/runtime.h"
-// #include "common/log.h"
+#include "common/log/log.h"
 
 static int exit_code = 0;
 static int is_exit = 0;
@@ -19,6 +19,9 @@ void exit_func(int exit_code_)
 
 int main(int argc, char **argv)
 {
+    log_init();
+    // log_info("main", "start main");
+
     // 临时方案从参数读取js文件路径
     if (argc < 2)
     {
