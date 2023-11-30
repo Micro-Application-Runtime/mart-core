@@ -4,16 +4,11 @@
 #include "runtime/modules/std/timer.h"
 
 void add_std(JSContext *ctx)
-{
-    JS_AddIntrinsicDate(ctx);
+{    
+    // 注册 console 到 global 对象中
+    js_add_console(ctx);
 
     JSValue global = JS_GetGlobalObject(ctx);
-
-    // 注册 console.log 到 global 对象中
-    JSValue console = JS_NewObject(ctx);
-    JS_SetPropertyStr(ctx, console, "log", JS_NewCFunction(ctx, js_console_log, "log", 1));
-    JS_SetPropertyStr(ctx, global, "console", console);
-
     // 注册 setTimeout 到 global 对象中
     JS_SetPropertyStr(ctx, global, "setTimeout", JS_NewCFunction(ctx, js_setTimeout, "setTimeout", 2));
 

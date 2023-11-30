@@ -3,6 +3,6 @@
 
 #include <quickjs.h>
 
-JSValue js_console_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
+void js_add_console(JSContext* ctx);
 
 #endif // __MODULES__STD__CONSOLE_H__

@@ -1,4 +1,5 @@
 #include "console.h"
+#include "common/utils.h"
 
 JSValue js_console_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
@@ -18,4 +19,19 @@ JSValue js_console_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueC
     }
     putchar('\n');
     return JS_UNDEFINED; 
+}
+
+static const JSCFunctionListEntry js_console_funcs[] = {
+    JS_CFUNC_DEF("log", -1, js_console_log),
+};
+
+static const JSCFunctionListEntry js_json_obj[] = {
+    JS_OBJECT_DEF("console", js_console_funcs, countof(js_console_funcs), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE),
+};
+
+void js_add_console(JSContext* ctx)
+{
+    JSValue global = JS_GetGlobalObject(ctx);
+    JS_SetPropertyFunctionList(ctx, global, js_json_obj, countof(js_json_obj));
+    JS_FreeValue(ctx, global);
 }
