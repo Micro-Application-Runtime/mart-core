@@ -20,7 +20,6 @@ void exit_func(int exit_code_)
 int main(int argc, char **argv)
 {
     log_init();
-    // log_info("main", "start main");
 
     // 临时方案从参数读取js文件路径
     if (argc < 2)
@@ -36,10 +35,9 @@ int main(int argc, char **argv)
     runtime_set_exit_func(&rt, exit_func);
     runtime_load_js_file(&rt, file_path);
 
-    // 通过 brige 想
     JSValue msg = JS_NewString(rt.qjs_ctx, "msg is received");
     JSValue args[] = {msg};
-    runtime_send_to_brige(&rt, 1, args);
+    runtime_send_to_bridge(&rt, 1, args);
     JS_FreeValue(rt.qjs_ctx, msg);
 
     while (!is_exit)

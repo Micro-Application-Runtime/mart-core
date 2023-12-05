@@ -2,11 +2,10 @@
 
 #include <memory.h>
 
+#include "config/common.h"
 #include "runtime/modules/std/std.h"
 #include "runtime/modules/process/process.h"
-#include "runtime/modules/brige/brige.h"
-
-#define BUF_SIZE 1 * 1024 * 1024
+#include "runtime/modules/bridge/bridge.h"
 
 int runtime_init(runtime_t *rt)
 {
@@ -31,8 +30,17 @@ int runtime_init(runtime_t *rt)
     // 注册模块到 QuickJS
     add_std(rt->qjs_ctx);
     add_process(rt->qjs_ctx);
-    add_brige(rt->qjs_ctx);
+    add_bridge(rt->qjs_ctx);
 
+#if DISABLE_EVAL
+    {
+        // 禁止在JS中使用 eval 函数
+        JSValue global = JS_GetGlobalObject(rt->qjs_ctx);
+        JS_SetPropertyStr(rt->qjs_ctx, global, "eval", JS_UNDEFINED);
+        // 释放 global 对象的引用
+        JS_FreeValue(rt->qjs_ctx, global);
+    }
+#endif
     return 0;
 }
 
@@ -61,7 +69,7 @@ int runtime_load_js_file(runtime_t *rt, const char *file_path)
         return -1;
     }
 
-    char *buf = malloc(BUF_SIZE);
+    char *buf = malloc(JS_FILE_BUF_SIZE);
 
     if (!buf)
     {
@@ -69,7 +77,7 @@ int runtime_load_js_file(runtime_t *rt, const char *file_path)
         return -1;
     }
 
-    size_t bytes_read = fread(buf, 1, BUF_SIZE, file);
+    size_t bytes_read = fread(buf, 1, JS_FILE_BUF_SIZE, file);
     fclose(file);
 
     if (bytes_read > 0)
@@ -109,14 +117,14 @@ int runtime_call_in_loop(runtime_t *rt, JSJobFunc func, int argc, JSValueConst *
     return 0;
 }
 
-int runtime_send_to_brige(runtime_t *rt, int argc, JSValueConst *argv)
+int runtime_send_to_bridge(runtime_t *rt, int argc, JSValueConst *argv)
 {
     if (rt == NULL)
     {
         return -1;
     }
 
-    send_to_brige(rt->qjs_ctx, argc, argv);
+    send_to_bridge(rt->qjs_ctx, argc, argv);
 }
 
 int runtime_run_loop(runtime_t *rt)

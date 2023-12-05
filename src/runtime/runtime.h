@@ -23,7 +23,7 @@ int runtime_load_js_file(runtime_t *rt, const char *file_path);
 
 int runtime_call_in_loop(runtime_t *rt, JSJobFunc func, int argc, JSValueConst *argv);
 
-int runtime_send_to_brige(runtime_t *rt, int argc, JSValueConst *argv);
+int runtime_send_to_bridge(runtime_t *rt, int argc, JSValueConst *argv);
 
 int runtime_run_loop(runtime_t *rt);
 
