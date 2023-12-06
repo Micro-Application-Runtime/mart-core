@@ -2,15 +2,24 @@
 
 #include <memory.h>
 
+#include "common/log/log.h"
 #include "config/common.h"
 #include "runtime/modules/std/std.h"
 #include "runtime/modules/process/process.h"
 #include "runtime/modules/bridge/bridge.h"
+#include "runtime/modules/demo/demo.h"
+#include "runtime/utils/quickjs_utils.h"
+
+#define RUMTIME_TAG "runtime"
+#define JS_TAG "JavaScript"
 
 int runtime_init(runtime_t *rt)
 {
+    LOG_I(RUMTIME_TAG, "Init ...");
+
     if (rt == NULL)
     {
+        LOG_F(RUMTIME_TAG, "Init error: rt is NULL");
         return -1;
     }
 
@@ -31,9 +40,11 @@ int runtime_init(runtime_t *rt)
     add_std(rt->qjs_ctx);
     add_process(rt->qjs_ctx);
     add_bridge(rt->qjs_ctx);
+    add_demo(rt->qjs_ctx);
 
 #if DISABLE_EVAL
     {
+        LOG_V(RUMTIME_TAG, "Disable eval func in JS runtime");
         // 禁止在JS中使用 eval 函数
         JSValue global = JS_GetGlobalObject(rt->qjs_ctx);
         JS_SetPropertyStr(rt->qjs_ctx, global, "eval", JS_UNDEFINED);
@@ -41,6 +52,7 @@ int runtime_init(runtime_t *rt)
         JS_FreeValue(rt->qjs_ctx, global);
     }
 #endif
+    LOG_I(RUMTIME_TAG, "Init finished.");
     return 0;
 }
 
@@ -58,46 +70,11 @@ int runtime_load_js_file(runtime_t *rt, const char *file_path)
 {
     if (rt == NULL)
     {
+        LOG_E(RUMTIME_TAG, "Load js error: rt is NULL");
         return -1;
     }
 
-    FILE *file = fopen(file_path, "r");
-
-    if (!file)
-    {
-        fprintf(stderr, "Failed to open file: %s\n", file_path);
-        return -1;
-    }
-
-    char *buf = malloc(JS_FILE_BUF_SIZE);
-
-    if (!buf)
-    {
-        fprintf(stderr, "malloc memory failed!\n");
-        return -1;
-    }
-
-    size_t bytes_read = fread(buf, 1, JS_FILE_BUF_SIZE, file);
-    fclose(file);
-
-    if (bytes_read > 0)
-    {
-        JSValue ret = JS_Eval(rt->qjs_ctx, buf, bytes_read, file_path, JS_EVAL_TYPE_MODULE);
-        JSValue exception = JS_GetException(rt->qjs_ctx);
-        if (!JS_IsNull(exception))
-        {
-            const char *exception_str = JS_ToCString(rt->qjs_ctx, exception);
-            fprintf(stderr, "Error executing JavaScript: %s\n", exception_str);
-            JS_FreeCString(rt->qjs_ctx, exception_str);
-        }
-        JS_FreeValue(rt->qjs_ctx, exception);
-        JS_FreeValue(rt->qjs_ctx, ret);
-    }
-
-    free(buf);
-    buf = NULL;
-
-    return 0;
+    return quickjs_load_js_file(rt->qjs_ctx, file_path);
 }
 
 int runtime_call_in_loop(runtime_t *rt, JSJobFunc func, int argc, JSValueConst *argv)
@@ -164,6 +141,8 @@ int runtime_run_loop(runtime_t *rt)
 
 int runtime_destory(runtime_t *rt)
 {
+    LOG_I(RUMTIME_TAG, "Destory ...");
+
     if (rt == NULL)
     {
         return -1;
@@ -175,6 +154,8 @@ int runtime_destory(runtime_t *rt)
     free(rt->uv_loop);
     JS_FreeContext(rt->qjs_ctx);
     JS_FreeRuntime(rt->qjs_rt);
+
+    LOG_I(RUMTIME_TAG, "Destory finish.");
 
     return 0;
 }

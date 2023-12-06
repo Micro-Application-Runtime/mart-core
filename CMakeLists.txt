@@ -31,25 +31,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_C_FLAGS "-g")
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
-include_directories(${PROJECT_SOURCE_DIR}/3rd/flashdb/inc)
-include_directories(${PROJECT_SOURCE_DIR}/3rd/flashdb/port/fal/inc)
 include_directories(${PROJECT_SOURCE_DIR}/src/config)
 
 # Set source files
 file(GLOB_RECURSE SOURCE "${PROJECT_SOURCE_DIR}/src/*.c")
 
-include_directories(
-    ${PROJECT_SOURCE_DIR}/3rd/EasyLogger/easylogger/inc
-    # ${PROJECT_SOURCE_DIR}/3rd/EasyLogger/easylogger/plugins/file
-    ${PROJECT_SOURCE_DIR}/src/platform/linux/easylogger
-)
-
-file(GLOB_RECURSE EASY_LOGGER_SOURCE
-    "${PROJECT_SOURCE_DIR}/3rd/EasyLogger/easylogger/src/*.c"
-    "${PROJECT_SOURCE_DIR}/3rd/EasyLogger/easylogger/src/platform/linux/easylogger/*c")
-
 # Add executable
-add_executable(${PROJECT_NAME} ${SOURCE} ${EASY_LOGGER_SOURCE})
+add_executable(${PROJECT_NAME} ${SOURCE})
 
 add_dependencies(${PROJECT_NAME} build_quickjs)
 
