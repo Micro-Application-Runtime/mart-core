@@ -1,52 +1,48 @@
 #include "console.h"
 
 #include <stdlib.h>
+#include <memory.h>
 
+#include "config/common.h"
 #include "common/utils.h"
-
-#define LOG_BUF_SIZE 256
+#include "common/log/log.h"
+#include "runtime/utils/jsutils.h"
 
 JSValue js_console_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-    // int i;
-    // const char *str;
-    // size_t len;
-
-    // for (i = 0; i < argc; i++)
-    // {
-    //     if (i != 0)
-    //         putchar(' ');
-    //     str = JS_ToCStringLen(ctx, &len, argv[i]);
-    //     if (!str)
-    //         return JS_EXCEPTION;
-    //     fwrite(str, 1, len, stdout);
-    //     JS_FreeCString(ctx, str);
-    // }
-    // putchar('\n');
-
-    char *buf = (char *)malloc(LOG_BUF_SIZE);
     const char *str = NULL;
+    size_t str_len = 0;
+    char *buf = GetRuntime(ctx)->log_buf;
+    const size_t log_buf_size = GetRuntime(ctx)->log_buf_size;
 
     int cur = 0;
-    size_t len = 0;
-
-    if (buf == NULL)
-    {
-        return JS_UNDEFINED;
-    }
+    size_t n = 0;
 
     for (int i = 0; i < argc; i++)
     {
-        str = JS_ToCStringLen(ctx, &len, argv[i]);
+        str = JS_ToCStringLen(ctx, &str_len, argv[i]);
+
         if (!str)
         {
             return JS_EXCEPTION;
         }
-        fwrite(str, 1, len, stdout);
+
+        if (str_len >= log_buf_size - cur)
+        {
+            n = log_buf_size - cur;
+        }
+        else
+        {
+            n = str_len;
+        }
+
+        memcpy(buf + cur, str, n);
+
         JS_FreeCString(ctx, str);
+        cur += n;
     }
 
-    putchar('\n');
+    LOG_I(JS_LOG_TAG, "%.*s", cur, buf);
 
     return JS_UNDEFINED;
 }

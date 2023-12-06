@@ -13,6 +13,8 @@ typedef struct
     JSContext *qjs_ctx;
     uv_loop_t *uv_loop;
     exit_func_t exit_func;
+    char* log_buf;
+    size_t log_buf_size;
 } runtime_t;
 
 int runtime_init(runtime_t *rt);

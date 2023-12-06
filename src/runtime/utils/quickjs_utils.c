@@ -6,7 +6,7 @@
 #include "common/log/log.h"
 
 #define RUMTIME_TAG "runtime"
-#define JS_TAG "JavaScript"
+#define JS_LOG_TAG "JavaScript"
 
 int quickjs_load_js_file(JSContext *ctx, const char *file_path)
 {
@@ -43,7 +43,7 @@ int quickjs_load_js_file(JSContext *ctx, const char *file_path)
         if (!JS_IsNull(exception))
         {
             const char *exception_str = JS_ToCString(ctx, exception);
-            LOG_E(JS_TAG, "Exception: %s", exception_str);
+            LOG_E(JS_LOG_TAG, "Exception: %s", exception_str);
             JS_FreeCString(ctx, exception_str);
         }
         JS_FreeValue(ctx, exception);

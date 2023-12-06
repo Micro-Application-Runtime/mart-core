@@ -13,6 +13,13 @@
 #define LOG_LEVEL_ERROR 4
 #define LOG_LEVEL_FATAL 5
 
+#define LOG_LEVEL_VERBOSE_LABEL "VERBOSE"
+#define LOG_LEVEL_DEBUG_LABEL "DEBUG"
+#define LOG_LEVEL_INFO_LABEL "INFO"
+#define LOG_LEVEL_WARNING_LABEL "WARNING"
+#define LOG_LEVEL_ERROR_LABEL "ERROR"
+#define LOG_LEVEL_FATAL_LABEL "FATAL"
+
 #define LOG(level, tag, format, ...)                                                    \
     do                                                                                  \
     {                                                                                   \
@@ -24,22 +31,22 @@
         switch (level)                                                                  \
         {                                                                               \
         case LOG_LEVEL_VERBOSE:                                                         \
-            level_str = "VERBOSE";                                                      \
+            level_str = LOG_LEVEL_VERBOSE_LABEL;                                        \
             break;                                                                      \
         case LOG_LEVEL_DEBUG:                                                           \
-            level_str = "DEBUG";                                                        \
+            level_str = LOG_LEVEL_DEBUG_LABEL;                                          \
             break;                                                                      \
         case LOG_LEVEL_INFO:                                                            \
-            level_str = "INFO";                                                         \
+            level_str = LOG_LEVEL_INFO_LABEL;                                           \
             break;                                                                      \
         case LOG_LEVEL_WARNING:                                                         \
-            level_str = "WARNING";                                                      \
+            level_str = LOG_LEVEL_WARNING_LABEL;                                        \
             break;                                                                      \
         case LOG_LEVEL_ERROR:                                                           \
-            level_str = "ERROR";                                                        \
+            level_str = LOG_LEVEL_ERROR_LABEL;                                          \
             break;                                                                      \
         case LOG_LEVEL_FATAL:                                                           \
-            level_str = "FATAL";                                                        \
+            level_str = LOG_LEVEL_FATAL_LABEL;                                          \
             break;                                                                      \
         default:                                                                        \
             level_str = "UNKNOWN";                                                      \

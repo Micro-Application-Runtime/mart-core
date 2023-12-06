@@ -10,16 +10,13 @@
 #include "runtime/modules/demo/demo.h"
 #include "runtime/utils/quickjs_utils.h"
 
-#define RUMTIME_TAG "runtime"
-#define JS_TAG "JavaScript"
-
 int runtime_init(runtime_t *rt)
 {
-    LOG_I(RUMTIME_TAG, "Init ...");
+    LOG_I(RUNTIME_LOG_TAG, "Init ...");
 
     if (rt == NULL)
     {
-        LOG_F(RUMTIME_TAG, "Init error: rt is NULL");
+        LOG_F(RUNTIME_LOG_TAG, "Init error: rt is NULL");
         return -1;
     }
 
@@ -29,6 +26,8 @@ int runtime_init(runtime_t *rt)
     rt->qjs_rt = JS_NewRuntime();
     rt->qjs_ctx = JS_NewContext(rt->qjs_rt);
     rt->uv_loop = malloc(sizeof(uv_loop_t));
+    rt->log_buf = malloc(JS_LOG_BUF_SIZE);
+    rt->log_buf_size = JS_LOG_BUF_SIZE;
 
     // 初始化libuv事件循环
     uv_loop_init(rt->uv_loop);
@@ -44,7 +43,7 @@ int runtime_init(runtime_t *rt)
 
 #if DISABLE_EVAL
     {
-        LOG_V(RUMTIME_TAG, "Disable eval func in JS runtime");
+        LOG_V(RUNTIME_LOG_TAG, "Disable eval func in JS runtime");
         // 禁止在JS中使用 eval 函数
         JSValue global = JS_GetGlobalObject(rt->qjs_ctx);
         JS_SetPropertyStr(rt->qjs_ctx, global, "eval", JS_UNDEFINED);
@@ -52,7 +51,7 @@ int runtime_init(runtime_t *rt)
         JS_FreeValue(rt->qjs_ctx, global);
     }
 #endif
-    LOG_I(RUMTIME_TAG, "Init finished.");
+    LOG_I(RUNTIME_LOG_TAG, "Init finished.");
     return 0;
 }
 
@@ -70,7 +69,7 @@ int runtime_load_js_file(runtime_t *rt, const char *file_path)
 {
     if (rt == NULL)
     {
-        LOG_E(RUMTIME_TAG, "Load js error: rt is NULL");
+        LOG_E(RUNTIME_LOG_TAG, "Load js error: rt is NULL");
         return -1;
     }
 
@@ -141,7 +140,7 @@ int runtime_run_loop(runtime_t *rt)
 
 int runtime_destory(runtime_t *rt)
 {
-    LOG_I(RUMTIME_TAG, "Destory ...");
+    LOG_I(RUNTIME_LOG_TAG, "Destory ...");
 
     if (rt == NULL)
     {
@@ -152,10 +151,11 @@ int runtime_destory(runtime_t *rt)
     uv_stop(rt->uv_loop);
     uv_loop_close(rt->uv_loop);
     free(rt->uv_loop);
+    free(rt->log_buf);
     JS_FreeContext(rt->qjs_ctx);
     JS_FreeRuntime(rt->qjs_rt);
 
-    LOG_I(RUMTIME_TAG, "Destory finish.");
+    LOG_I(RUNTIME_LOG_TAG, "Destory finish.");
 
     return 0;
 }
