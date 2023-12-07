@@ -20,14 +20,18 @@ add_custom_target(build_quickjs
     add_custom_target ${QUICKJS_DIR}/libquickjs.a
 )
 
-# Set libuv directory
+# Add libuv
 set(LIBUV_DIR ${PROJECT_SOURCE_DIR}/3rd/libuv)
-
-# Add libuv subdirectory
 add_subdirectory(${LIBUV_DIR} EXCLUDE_FROM_ALL)
+
+# Add curl
+set(CURL_DIR ${PROJECT_SOURCE_DIR}/3rd/curl)
+add_subdirectory(${CURL_DIR} EXCLUDE_FROM_ALL)
 
 # Set binary output directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# Debug flag
 set(CMAKE_C_FLAGS "-g")
 
 include_directories(${PROJECT_SOURCE_DIR}/3rd/sqlite3)
@@ -48,4 +52,4 @@ set_target_properties(quickjs PROPERTIES IMPORTED_LOCATION ${QUICKJS_DIR}/libqui
 include_directories(${QUICKJS_DIR})
 
 # Link libuv to the executable
-target_link_libraries(${PROJECT_NAME} uv_a quickjs dl m)
+target_link_libraries(${PROJECT_NAME} quickjs uv_a libcurl dl m)
