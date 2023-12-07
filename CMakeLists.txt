@@ -30,14 +30,15 @@ add_subdirectory(${LIBUV_DIR} EXCLUDE_FROM_ALL)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_C_FLAGS "-g")
 
+include_directories(${PROJECT_SOURCE_DIR}/3rd/sqlite3)
 include_directories(${PROJECT_SOURCE_DIR}/src)
-include_directories(${PROJECT_SOURCE_DIR}/src/config)
 
 # Set source files
 file(GLOB_RECURSE SOURCE "${PROJECT_SOURCE_DIR}/src/*.c")
+file(GLOB_RECURSE SQLITE3_SOURCE "${PROJECT_SOURCE_DIR}/3rd/sqlite3/sqlite3.c")
 
 # Add executable
-add_executable(${PROJECT_NAME} ${SOURCE})
+add_executable(${PROJECT_NAME} ${SOURCE} ${SQLITE3_SOURCE})
 
 add_dependencies(${PROJECT_NAME} build_quickjs)
 

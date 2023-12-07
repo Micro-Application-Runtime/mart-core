@@ -4,7 +4,7 @@
 #include <uv.h>
 
 #include "runtime/runtime.h"
-#include "runtime/utils/jsutils.h"
+#include "runtime/utils/runtime_utils.h"
 
 JSValue jsjob_call_callback(JSContext *ctx, int argc, JSValueConst *argv)
 {

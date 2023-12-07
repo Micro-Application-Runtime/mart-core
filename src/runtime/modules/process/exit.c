@@ -1,7 +1,7 @@
 #include "exit.h"
 
 #include "runtime/runtime.h"
-#include "runtime/utils/jsutils.h"
+#include "runtime/utils/runtime_utils.h"
 
 JSValue js_process_exit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {

@@ -6,7 +6,7 @@
 #include "config/common.h"
 #include "common/utils.h"
 #include "common/log/log.h"
-#include "runtime/utils/jsutils.h"
+#include "runtime/utils/runtime_utils.h"
 
 JSValue js_console_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
