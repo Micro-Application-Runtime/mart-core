@@ -4,5 +4,6 @@
 #include <quickjs.h>
 
 void add_std(JSContext *ctx);
+void destory_std(JSContext *ctx);
 
 #endif // __MODULES__STD__STD_H__

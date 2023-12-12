@@ -6,31 +6,67 @@
 #include "runtime/runtime.h"
 #include "runtime/utils/runtime_utils.h"
 
-JSValue jsjob_call_callback(JSContext *ctx, int argc, JSValueConst *argv)
+typedef struct
+{
+    JSContext *ctx;
+    JSValue func;
+} timer_data_t;
+
+static timer_data_t *getTimerData(uv_handle_t *handle)
+{
+    return (timer_data_t *)handle->data;
+}
+
+static void timerCloseCallback(uv_handle_t *handle)
+{
+    timer_data_t *data = getTimerData(handle);
+    JSContext *ctx = data->ctx;
+    JS_FreeValue(ctx, data->func);
+    free(data);
+    handle->data = NULL;
+}
+
+static void timerWalkCallback(uv_handle_t *handle, void *arg)
+{
+    if (handle->type == UV_TIMER && handle->data)
+    {
+        timerCloseCallback(handle);
+    }
+}
+
+static JSValue jsjob_TimerCallback(JSContext *ctx, int argc, JSValueConst *argv)
 {
     // 调用QuickJS的回调函数
     JSValue func = argv[0];
     JS_Call(ctx, func, JS_UNDEFINED, 0, NULL);
 }
 
-void setTimeout_callback(uv_timer_t *handle)
+static void setTimeoutCallback(uv_timer_t *handle)
 {
-    timer_callback_data_t *data = (timer_callback_data_t *)handle->data;
+    timer_data_t *data = handle->data;
     JSContext *ctx = data->ctx;
     JSValue func = data->func;
-    free(data);
 
     JSValue args[] = {func};
 
-    JS_EnqueueJob(ctx, jsjob_call_callback, 1, args);
-
-    // 释放资源
-    JS_FreeValue(ctx, func);
+    JS_EnqueueJob(ctx, jsjob_TimerCallback, 1, args);
 
     // 关闭和释放定时器句柄
-    uv_close((uv_handle_t *)handle, NULL);
+    uv_close((uv_handle_t *)handle, &timerCloseCallback);
 }
 
+static void setIntervalCallback(uv_timer_t *handle)
+{
+    timer_data_t *data = handle->data;
+    JSContext *ctx = data->ctx;
+    JSValue func = data->func;
+
+    JSValue args[] = {func};
+
+    JS_EnqueueJob(ctx, jsjob_TimerCallback, 1, args);
+}
+
+// JavaScript Function Begin
 JSValue js_setTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
     if (argc < 2)
@@ -45,7 +81,7 @@ JSValue js_setTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueCo
         return JS_ThrowTypeError(ctx, "Invalid arguments");
     }
 
-    timer_callback_data_t *data = malloc(sizeof(timer_callback_data_t));
+    timer_data_t *data = malloc(sizeof(timer_data_t));
     JSValue func = JS_DupValue(ctx, argv[0]);
     data->ctx = ctx;
     data->func = func;
@@ -57,7 +93,7 @@ JSValue js_setTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueCo
     timer->data = data;
 
     // 启动定时器
-    uv_timer_start(timer, setTimeout_callback, delay, 0);
+    uv_timer_start(timer, setTimeoutCallback, delay, 0);
     JSValue ret = JS_NewInt64(ctx, (int64_t)timer);
     return ret;
 }
@@ -78,27 +114,10 @@ JSValue js_clearTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValue
     JS_ToInt64(ctx, &timer_id, argv[0]);
     uv_timer_t *timer = (uv_timer_t *)timer_id;
 
-    if (timer != NULL)
-    {
-        timer_callback_data_t *data = timer->data;
-        JS_FreeValue(ctx, data->func);
-        free(data);
-        timer->data = NULL;
-        uv_timer_stop(timer);
-    }
+    uv_timer_stop(timer);
+    uv_close((uv_handle_t *)timer, &timerCloseCallback);
 
     return JS_UNDEFINED;
-}
-
-void setInterval_callback(uv_timer_t *handle)
-{
-    timer_callback_data_t *data = (timer_callback_data_t *)handle->data;
-    JSContext *ctx = data->ctx;
-    JSValue func = data->func;
-
-    JSValue args[] = {func};
-
-    JS_EnqueueJob(ctx, jsjob_call_callback, 1, args);
 }
 
 JSValue js_setInterval(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -117,7 +136,7 @@ JSValue js_setInterval(JSContext *ctx, JSValueConst this_val, int argc, JSValueC
         return JS_ThrowTypeError(ctx, "Invalid arguments");
     }
 
-    timer_callback_data_t *data = malloc(sizeof(timer_callback_data_t));
+    timer_data_t *data = malloc(sizeof(timer_data_t));
     JSValue func = JS_DupValue(ctx, argv[0]);
     data->ctx = ctx;
     data->func = func;
@@ -129,7 +148,38 @@ JSValue js_setInterval(JSContext *ctx, JSValueConst this_val, int argc, JSValueC
     timer->data = data;
 
     // 启动定时器
-    uv_timer_start(timer, setInterval_callback, delay, delay);
+    uv_timer_start(timer, setIntervalCallback, delay, delay);
     JSValue ret = JS_NewInt64(ctx, (int64_t)timer);
     return ret;
+}
+
+JSValue js_clearInterval(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc < 1)
+    {
+        return JS_ThrowTypeError(ctx, "Invalid arguments");
+    }
+
+    if (!JS_IsNumber(argv[0]))
+    {
+        return JS_ThrowTypeError(ctx, "Invalid arguments");
+    }
+
+    int64_t timer_id = 0;
+    JS_ToInt64(ctx, &timer_id, argv[0]);
+    uv_timer_t *timer = (uv_timer_t *)timer_id;
+
+    uv_timer_stop(timer);
+    uv_close((uv_handle_t *)timer, &timerCloseCallback);
+
+    return JS_UNDEFINED;
+}
+
+// JavaScript Function End
+
+void close_all_timer(JSContext *ctx)
+{
+    runtime_t *rt = GetRuntime(ctx);
+    // 查询所有定时器并释放资源
+    uv_walk(rt->uv_loop, &timerWalkCallback, ctx);
 }

@@ -147,7 +147,8 @@ int runtime_destory(runtime_t *rt)
         return -1;
     }
 
-    // TODO: libuv中的数据应该被释放
+    destory_std(rt->qjs_ctx);
+
     uv_stop(rt->uv_loop);
     uv_loop_close(rt->uv_loop);
     free(rt->uv_loop);
