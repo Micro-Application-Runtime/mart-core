@@ -36,7 +36,6 @@ static void timerWalkCallback(uv_handle_t *handle, void *arg)
 
 static JSValue jsjob_TimerCallback(JSContext *ctx, int argc, JSValueConst *argv)
 {
-    // 调用QuickJS的回调函数
     JSValue func = argv[0];
     JS_Call(ctx, func, JS_UNDEFINED, 0, NULL);
 }
@@ -75,7 +74,8 @@ JSValue js_setTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueCo
     }
 
     // 获取延迟时间和回调函数
-    int64_t delay;
+    int64_t delay = 0;
+
     if (!JS_IsFunction(ctx, argv[0]) || JS_ToInt64(ctx, &delay, argv[1]))
     {
         return JS_ThrowTypeError(ctx, "Invalid arguments");
@@ -122,8 +122,6 @@ JSValue js_clearTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValue
 
 JSValue js_setInterval(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-    // TODO: 目前当定时器没有关闭而退出程序的时候会出现js内存泄漏，
-
     if (argc < 2)
     {
         return JS_ThrowTypeError(ctx, "Invalid arguments");

@@ -117,22 +117,9 @@ int runtime_run_loop(runtime_t *rt)
     JSContext *ctx1;
     int err = JS_ExecutePendingJob(rt->qjs_rt, &ctx1);
 
-    if (err <= 0)
+    if (err < 0)
     {
-        if (err < 0)
-        {
-            // show exception
-            JSValue exception = JS_GetException(rt->qjs_ctx);
-
-            if (!JS_IsNull(exception))
-            {
-                const char *exception_str = JS_ToCString(rt->qjs_ctx, exception);
-                fprintf(stderr, "JavaScript Error: %s\n", exception_str);
-                JS_FreeCString(rt->qjs_ctx, exception_str);
-            }
-
-            JS_FreeValue(rt->qjs_ctx, exception);
-        }
+        quickjs_dump_exception(ctx1);
     }
 
     return 0;
@@ -147,6 +134,7 @@ int runtime_destory(runtime_t *rt)
         return -1;
     }
 
+    // 一些模块需要销毁方法
     destory_std(rt->qjs_ctx);
 
     uv_stop(rt->uv_loop);

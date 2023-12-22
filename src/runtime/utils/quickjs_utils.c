@@ -39,14 +39,7 @@ int quickjs_load_js_file(JSContext *ctx, const char *file_path)
     if (bytes_read > 0)
     {
         JSValue ret = JS_Eval(ctx, buf, bytes_read, file_path, JS_EVAL_TYPE_MODULE);
-        JSValue exception = JS_GetException(ctx);
-        if (!JS_IsNull(exception))
-        {
-            const char *exception_str = JS_ToCString(ctx, exception);
-            LOG_E(JS_LOG_TAG, "Exception: %s", exception_str);
-            JS_FreeCString(ctx, exception_str);
-        }
-        JS_FreeValue(ctx, exception);
+        quickjs_dump_exception(ctx);
         JS_FreeValue(ctx, ret);
     }
     else
@@ -58,4 +51,53 @@ int quickjs_load_js_file(JSContext *ctx, const char *file_path)
     buf = NULL;
 
     return 0;
+}
+
+void quickjs_dump_exception(JSContext *ctx)
+{
+    // show exception
+    JSValue exception = JS_GetException(ctx);
+
+    if (JS_IsError(ctx, exception) && !JS_IsNull(exception))
+    {
+        JSValue lineNumber = JS_GetPropertyStr(ctx, exception, "lineNumber");
+
+        if(JS_IsUndefined(lineNumber)) {
+            LOG_E("JavaScript", "JS_IsUndefined");
+        }
+
+        if(JS_IsNull(lineNumber)) {
+            LOG_E("JavaScript", "JS_IsNull");
+        }
+
+        if (JS_IsNumber(lineNumber))
+        {
+            int num = 0;
+            if (JS_ToInt32(ctx, &num, lineNumber))
+            {
+                LOG_E("JavaScript", "JavaScript lineNumber: %d", num);
+            };
+        }
+
+        if (JS_IsString(lineNumber))
+        {
+            const char *lineNumber_str = JS_ToCString(ctx, lineNumber);
+            LOG_E("JavaScript", "JavaScript lineNumber: %s", lineNumber_str);
+            JS_FreeCString(ctx, lineNumber_str);
+        }
+        
+
+        const char *exception_str = JS_ToCString(ctx, exception);
+        JSValue stack = JS_GetPropertyStr(ctx, exception, "stack");
+        const char *stack_str = JS_ToCString(ctx, stack);
+        LOG_E("JavaScript",
+              "\n\n%s\n%s",
+              exception_str,
+              stack_str);
+        JS_FreeCString(ctx, exception_str);
+        JS_FreeCString(ctx, stack_str);
+        JS_FreeValue(ctx, stack);
+    }
+
+    JS_FreeValue(ctx, exception);
 }
